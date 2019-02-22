@@ -19,6 +19,7 @@ MemoryGame = function(gs){
 	this.encontrando = false;
 	this.cartaBuscada = -1;
 	var timeGeneral;
+	this.espera = false;
 
 	this.initGame = function initGame(){
 
@@ -68,36 +69,39 @@ MemoryGame = function(gs){
 	};
 
 	this.onClick = function onClick(cardId){
-		if(!this.juego[cardId].volteada){
-			this.juego[cardId].flip();
-			if(this.encontrando){
-				if (this.juego[cardId].compareTo(this.juego[this.cartaBuscada])){
-					this.fallo = false;
-					this.punto = true;
+		if(!this.espera){
+			if(!this.juego[cardId].volteada){
+				this.juego[cardId].flip();
+				if(this.encontrando){
+					if (this.juego[cardId].compareTo(this.juego[this.cartaBuscada])){
+						this.fallo = false;
+						this.punto = true;
+						this.encontrando = false;
+						this.puntos++;
+					}
+					else{
+						this.fallo = true;
+						this.espera = true;
+						var that = this;
+						setTimeout(function(){that.taparCartas();}, 1000);
+					}
 					this.encontrando = false;
-					this.puntos++;
 				}
+			
 				else{
-					this.fallo = true;
-					var that = this;
-					setTimeout(function(){that.taparCartas();}, 1000);
+					this.encontrando = true;
+					this.cartaBuscada = cardId;
 				}
-				this.encontrando = false;
 			}
-		
-			else{
-				this.encontrando = true;
-				this.cartaBuscada = cardId;
-			}
-		}
-		
+			
 
-		this.taparCartas = function taparCartas(){
-			this.punto = false;
-			this.juego[cardId].flip();
-			this.juego[this.cartaBuscada].flip();
+			this.taparCartas = function taparCartas(){
+				this.punto = false;
+				this.juego[cardId].flip();
+				this.juego[this.cartaBuscada].flip();
+				this.espera = false;
+			}
 		}
-		
 	};
 
 	//Auxiliar para rellenar el array con números aleatorios del 0 al 15
